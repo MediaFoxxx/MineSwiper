@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Cell():
+class Cell:
     def __init__(self, x, y, is_mined):
         self.x = x
         self.y = y
@@ -21,7 +21,7 @@ class Cell():
             return '*'
 
 
-class Field():
+class Field:
     def __init__(self, x_size, y_size, mines):
         self.x_size = x_size
         self.y_size = y_size
@@ -55,14 +55,12 @@ class Field():
             for j in range(-1, 2):
                 if i == j == 0:
                     continue
-                if y + i > -1 and y + i < self.y_size and x + j > -1 and x + j < self.x_size:
+                if y + i in range(0, self.y_size) and x + j in range(0, self.x_size):
                     nghbs.append((y + i, x + j))
         return nghbs
 
 
-fld = Field(6, 6, 10)
-print(fld)
-print(fld.field_arr[5][5].x)
-print(fld.field_arr[5][5].y)
-print(fld.get_nghbs(5, 5))
-
+if __name__ == '__main__':
+    fld = Field(6, 6, 10)
+    print(fld)
+    print(fld.get_nghbs(5, 5))
