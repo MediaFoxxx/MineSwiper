@@ -38,4 +38,4 @@ class Field():
 if __name__ == '__main__':
     fld = Field(20, 30, 100)
     print(fld)
-    132222bbbbо
+    132222bbbbоxxx
