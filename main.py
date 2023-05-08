@@ -75,3 +75,5 @@ if __name__ == '__main__':
     print(fld.field_arr[0][1].x)
     print(fld.field_arr[0][1].y)
     print(fld.get_nghbs(19, 0))
+
+privet mame
