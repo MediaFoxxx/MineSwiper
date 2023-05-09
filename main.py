@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Cell():
+class Cell:
     def __init__(self, x, y, is_mined):
         self.x = x
         self.y = y
@@ -31,7 +31,7 @@ class Cell():
             return '*'
 
 
-class Field():
+class Field:
     def __init__(self, x_size, y_size, mines):
         np.random.seed(1)
         self.x_size = x_size
@@ -83,16 +83,16 @@ class Field():
                 self.reveal(nghb.x, nghb.y)
 
 
-fld = Field(9, 9, 10)
-while (True):
-    print(fld)
-    inp = int(input())
-    if inp == 0:
-        break
-    if inp == 1:
-        xy = input().split(' ')
-        fld.reveal(int(xy[0]), int(xy[1]))
-    if inp == 2:
-        xy = input().split(' ')
-        fld.field_arr[int(xy[1])][int(xy[0])].is_marked = 1
-
+if __name__ == '__main__':
+    fld = Field(9, 9, 10)
+    while True:
+        print(fld)
+        inp = int(input())
+        if inp == 0:
+            break
+        if inp == 1:
+            xy = input().split(' ')
+            fld.reveal(int(xy[0]), int(xy[1]))
+        if inp == 2:
+            xy = input().split(' ')
+            fld.field_arr[int(xy[1])][int(xy[0])].is_marked = 1
