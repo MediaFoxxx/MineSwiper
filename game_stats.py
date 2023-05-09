@@ -20,6 +20,7 @@ class GameStats:
     def reset_stats(self):
         """Инициализирует статистику, изменяющуюся в ходе игры."""
         self.mines_left = self.settings.mines_limit
+        self.first_step = True
 
     def _set_high_score(self):
         """Устанавливаем максимальный результат из файла."""

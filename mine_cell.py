@@ -11,10 +11,11 @@ class Cells(Sprite):
         self.screen = eg_game.screen
         self.settings = eg_game.settings
 
-        #
+        # Игровые параметры ячейки
         self.is_mined = 0
         self.num_mines = 0
         self.is_shown = False
+        self.is_marked = False
 
         # Каждая новая ячейка появляется в левом верхнем углу экрана.
         self.rect = pygame.Rect(0, 0, self.settings.cell_width, self.settings.cell_height)
@@ -28,28 +29,24 @@ class Cells(Sprite):
     def draw_cell(self, color):
         """Размещение ячейки на экране."""
         self.screen.fill(color, self.rect)
-        if self.is_shown:
+        if self.is_shown or self.is_marked:
             self.show_score()
 
     def prep_info(self):
-        """Преобразует текущий счет в графическое изображение."""
-        if self.is_mined == 1:
-            score_str = '*'
+        """Отрисовка информации на открытой ячейке."""
+        if self.is_marked:
+            info_str = 'F'
+        elif self.is_mined == 1:
+            info_str = '*'
         else:
-            score_str = str(self.num_mines)
-        self.score_image = self.font.render(score_str, True,
-                                            self.text_color, self.settings.cell_color)
+            info_str = str(self.num_mines)
+        self.info_image = self.font.render(info_str, True, self.text_color, self.settings.cell_color)
 
-        # Вывод счета выше кноки Play.
-        self.score_rect = self.score_image.get_rect()
-        self.score_rect.center = self.rect.center
-        # self.score_rect.centery -= 50
+        # Вывод счета ниже кнопки Play.
+        self.info_rect = self.info_image.get_rect()
+        self.info_rect.center = self.rect.center
 
     def show_score(self):
-        """Вывод счета во время игры."""
-
+        """Вывод кол-ва мин во время игры."""
         self.prep_info()
-        self.screen.blit(self.score_image, self.score_rect)
-
-        # self.score_rect.bottom = 3 * (self.settings.cell_indent + self.settings.cell_height)
-        # self.screen.blit(self.score_image, self.score_rect)
+        self.screen.blit(self.info_image, self.info_rect)
