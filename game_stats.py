@@ -11,7 +11,7 @@ class GameStats:
 
         # Игра запускается в неактивном состоянии.
         self.game_active = False
-        # self.question_active = False
+        self.first_step = True
 
         # Рекорд не должен сбрасываться.
         # self.high_score = 0

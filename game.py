@@ -105,15 +105,23 @@ class MineSwiper:
 
             # Создание ячеек с вопросами.
             self._create_grid_of_cells()
-            self._set_first_mines()
 
-    def _set_first_mines(self):
+    def _set_first_mines(self, cur_cell):
         """Задание мин на начальном поле."""
-        field_arr = np.zeros((self.settings.x_cells * self.settings.y_cells), dtype=int)
+        self._get_neighbors(cur_cell)
+        neighs = [convert(cell.rect[0], cell.rect[1]) for cell in cur_cell.neighbors.copy()]
+        neighs = [x + y * self.settings.x_cells for x, y in neighs]
+        x, y = convert(cur_cell.rect[0], cur_cell.rect[1])
+        neighs.append(x + y * self.settings.x_cells)
+
+        field_arr = np.zeros((self.settings.x_cells * self.settings.y_cells - len(neighs)), dtype=int)
 
         for i in range(self.settings.mines_limit):
             field_arr[i] = 1
         np.random.shuffle(field_arr)
+
+        for xy in sorted(neighs):
+            field_arr = np.insert(field_arr, xy, 0)
 
         for num, cell in enumerate(self.cells):
             cell.is_mined = field_arr[num]
@@ -121,31 +129,53 @@ class MineSwiper:
         for cell in self.cells:
             self._get_neighbors(cell)
 
-            for neigh_cell in cell.neighs:
+            for neigh_cell in cell.neighbors:
                 cell.num_mines += neigh_cell.is_mined
 
     def _get_neighbors(self, cell):
         """Нахождение соседей клетки."""
         cell_x, cell_y = convert(cell.rect[0], cell.rect[1])
-        cell.neighs = []
-        for x in range(-1, 2):
-            for y in range(-1, 2):
+        cell.neighbors = []
+        for y in range(-1, 2):
+            for x in range(-1, 2):
                 if x == y == 0:
                     continue
                 if cell_x + x in range(0, self.settings.x_cells) and cell_y + y in range(0, self.settings.y_cells):
-                    xy = cell_x + x + cell_y + y
+                    xy = cell_x + x + (cell_y + y) * self.settings.x_cells
                     if not self.cells.sprites()[xy].is_shown:
-                        cell.neighs.append(self.cells.sprites()[xy])
+                        cell.neighbors.append(self.cells.sprites()[xy])
 
     def _check_cells_button(self, mouse_pos):
         """Проверка нажатия на ячейку с вопросом."""
         for cell in self.cells:
             if cell.rect.collidepoint(mouse_pos):
-                # self.stats.question_active = True
-                self._create_opened_cell(cell)
+
+                if self.stats.first_step:
+                    self._set_first_mines(cell)
+                    self.stats.first_step = False
+                    # break
+
+                if not cell.is_shown:
+                    self._create_opened_cell(cell)
+                if cell.num_mines == 0:
+                    self._reveal(cell)
+
                 # self.cells.remove(cell)
                 # self.questions.get_new_question()
                 break
+
+    def _reveal(self, cell):
+        """Открытие пустых ячеек."""
+        cell.is_shown = True
+
+        for nei_cell in cell.neighbors:
+
+            if nei_cell.num_mines == 0 and not nei_cell.is_shown:
+                nei_cell.is_shown = True
+                self._reveal(nei_cell)
+            else:
+                nei_cell.is_shown = True
+
 
     # def _check_answer_buttons(self, mouse_pos):
     #     """Проверка нажатия на кноку ответа на вопрос."""
@@ -177,7 +207,6 @@ class MineSwiper:
         """Создание ячейки и размещение ее в ряду."""
         cell = Cells(self)
         cell_width, cell_height = cell.rect.size
-        # cell.x =
         cell.rect.x = self.settings.cell_indent * (1 + cell_number) + cell_number * cell_width + 160
         cell.rect.y = self.settings.cell_indent * (1 + row_number) + row_number * cell_height + 300
         self.cells.add(cell)
@@ -225,6 +254,7 @@ def convert(x, y, forw=True):
         new_y = y * 50 + 310
 
         return new_x + new_y
+
 
 if __name__ == '__main__':
     # Создание экземпляра и запуск игры
