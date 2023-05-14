@@ -161,7 +161,7 @@ class MineSwiper:
                     self.stats.first_step = False
                     # break
 
-                if cell.is_mined:
+                if cell.is_mined and not cell.is_marked:
                     self.stats.game_active = False
                 else:
                     if not cell.is_shown:
