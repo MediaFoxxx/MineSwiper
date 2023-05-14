@@ -33,7 +33,7 @@ class Cell:
 
 class Field:
     def __init__(self, x_size, y_size, mines):
-        np.random.seed(1)
+        # np.random.seed(1)
         self.x_size = x_size
         self.y_size = y_size
         self.mines_num = mines
@@ -62,10 +62,13 @@ class Field:
 
     def get_nghbs(self, x, y):
         nghbs = []
+
         for i in range(-1, 2):
             for j in range(-1, 2):
+
                 if i == j == 0:
                     continue
+
                 if y + i > -1 and y + i < self.y_size and x + j > -1 and x + j < self.x_size:
                     if self.field_arr[y + i][x + j].is_shown == 0:
                         nghbs.append(self.field_arr[y + i][x + j])

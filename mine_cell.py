@@ -36,11 +36,17 @@ class Cells(Sprite):
         """Отрисовка информации на открытой ячейке."""
         if self.is_marked:
             info_str = 'F'
+            self.text_color = (0, 0, 0)
         elif self.is_mined == 1:
             info_str = '*'
+            self.text_color = (0, 0, 0)
         else:
-            info_str = str(self.num_mines)
-        self.info_image = self.font.render(info_str, True, self.text_color, self.settings.cell_color)
+            info_str = str(self.num_mines)\
+
+        if not self.is_marked:
+            self.info_image = self.font.render(info_str, True, self.text_color, self.settings.cell_color)
+        else:
+            self.info_image = self.font.render(info_str, True, self.text_color, self.settings.opened_cell_color)
 
         # Вывод счета ниже кнопки Play.
         self.info_rect = self.info_image.get_rect()
@@ -48,5 +54,6 @@ class Cells(Sprite):
 
     def show_score(self):
         """Вывод кол-ва мин во время игры."""
+        self.text_color = self.settings.nums_colors[self.num_mines]
         self.prep_info()
         self.screen.blit(self.info_image, self.info_rect)

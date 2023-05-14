@@ -12,8 +12,9 @@ class Settings:
         self.cell_width = 40
         self.cell_height = 40
         self.cell_indent = 10
-        self.cell_color = (255, 255, 255)
-        self.opened_cell_color = (21, 32, 229)
+        # self.cell_color = (255, 255, 255)
+        self.cell_color = (220, 220, 220)
+        self.opened_cell_color = (150, 150, 150)
 
         # Игровые параметры
         self.x_cells = 9
@@ -30,6 +31,18 @@ class Settings:
             "font_size": 48,
             "centery": self.screen_height // 2
         }
+
+        self.nums_colors = (
+            (220, 220, 220),
+            (0, 0, 255),
+            (0, 255, 0),
+            (255, 0, 0),
+            (0, 0, 128),
+            (128, 64, 48),
+            (48, 213, 200),
+            (0, 0, 0),
+            (255, 255, 255)
+        )
         # self.question_button = {
         #     "width": 6 * (self.cell_width + self.cell_indent) - self.cell_indent,
         #     "height": self.cell_height,

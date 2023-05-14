@@ -147,11 +147,12 @@ class MineSwiper:
                 if cell_x + x in range(0, self.settings.x_cells) and cell_y + y in range(0, self.settings.y_cells):
                     # Одномерные координаты точки
                     xy = cell_x + x + (cell_y + y) * self.settings.x_cells
-                    if not self.cells.sprites()[xy].is_shown:
+                    if not self.cells.sprites()[xy].is_shown or \
+                            self.cells.sprites()[xy].is_shown and self.cells.sprites()[xy].is_marked:
                         cell.neighbors.append(self.cells.sprites()[xy])
 
     def _check_cells_button(self, mouse_pos):
-        """Проверка нажатия ЛКМ на ячейку с вопросом."""
+        """Проверка нажатия ЛКМ на ячейку."""
         for cell in self.cells:
             if cell.rect.collidepoint(mouse_pos):
 
@@ -160,10 +161,15 @@ class MineSwiper:
                     self.stats.first_step = False
                     # break
 
-                if not cell.is_shown:
-                    cell.is_shown = True
-                if cell.num_mines == 0:
-                    self._reveal(cell)
+                if cell.is_mined:
+                    self.stats.game_active = False
+                else:
+                    if not cell.is_shown:
+                        cell.is_shown = True
+                    if cell.num_mines == 0:
+                        self._reveal(cell)
+                    if cell.num_mines != 0:
+                        self._set_accord(cell)
 
                 break
 
@@ -171,25 +177,44 @@ class MineSwiper:
         """Открытие пустых ячеек."""
         cell.is_shown = True
 
-        for nei_cell in cell.neighbors:
+        if not cell.is_marked:
+            for nei_cell in cell.neighbors:
 
-            if nei_cell.num_mines == 0 and not nei_cell.is_shown:
-                nei_cell.is_shown = True
-                self._reveal(nei_cell)
-            else:
-                nei_cell.is_shown = True
+                if nei_cell.is_mined and not nei_cell.is_marked:
+                    self.stats.game_active = False
+                else:
+                    if nei_cell.num_mines == 0 and not nei_cell.is_shown:
+                        nei_cell.is_shown = True
+                        self._reveal(nei_cell)
+                    else:
+                        nei_cell.is_shown = True
+
+    def _set_accord(self, cell):
+        """Аккорд."""
+        if not cell.is_marked:
+            summ = 0
+
+            for neighbor in cell.neighbors:
+                if neighbor.is_marked:
+                    summ += 1
+
+            if summ == cell.num_mines:
+                self._reveal(cell)
 
     def _set_flag(self, mouse_pos):
         """Установка флага на точке."""
         for cell in self.cells:
             if cell.rect.collidepoint(mouse_pos):
-                if not cell.is_shown:
-                    if cell.is_marked:
-                        cell.is_marked = False
-                        self.stats.mines_left += 1
-                    else:
-                        cell.is_marked = True
-                        self.stats.mines_left -= 1
+
+                if cell.is_shown and cell.is_marked:
+                    cell.is_marked = False
+                    cell.is_shown = False
+                    self.stats.mines_left += 1
+
+                elif not cell.is_shown and not cell.is_marked:
+                    cell.is_marked = True
+                    cell.is_shown = True
+                    self.stats.mines_left -= 1
                 break
 
     def _check_quit_level_button(self, mouse_pos):
@@ -221,7 +246,10 @@ class MineSwiper:
             # self.ms.show_stats()
         else:
             for cell in self.cells.sprites():
-                cell.draw_cell(self.settings.cell_color)
+                if not cell.is_shown or cell.is_marked:
+                    cell.draw_cell(self.settings.opened_cell_color)
+                else:
+                    cell.draw_cell(self.settings.cell_color)
 
             self.ms.show_score()
             self.quit_level_button.draw_button()
